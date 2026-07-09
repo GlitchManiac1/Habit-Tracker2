@@ -2,11 +2,40 @@ import datetime
 
 FILENAME = "habits.txt"
 
+def already_logged_today(habit_name):
+    # TODO:
+    state = False
+    date_today = str(datetime.date.today())
+    # 1. Get today's date as a string (same way you did in log_habit)
+    with open(FILENAME, "r") as f:
+        for line in f:
+            splitup = line.strip().split(",")
+            if splitup[0] == date_today:
+                if splitup[1] == habit_name:
+                    state = True
+                    break
+                else:
+                    continue
+            else:
+                continue
+    return state
+    # 2. Open FILENAME in read mode
+    # 3. Loop through each line, split it like you did in view_progress
+    # 4. If a line's date matches today AND habit_name matches,
+    #    return True
+    # 5. If you finish the loop without finding a match, return False
+    pass
 
 def log_habit():
     # TODO:
     # 1. Ask the user (input()) for a habit name
     habit = input("Please enter a habit name: ")
+
+    answer = already_logged_today(habit)
+    if answer == True:
+        print("You already logged that habit today")
+        return
+
     # 2. Ask the user whether it was "done" or "missed"
     affirm = input("Was it done or missed: ").strip().lower()
     # 3. Get today's date (hint: datetime.date.today())
