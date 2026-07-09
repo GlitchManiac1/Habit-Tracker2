@@ -44,10 +44,25 @@ def view_progress():
     pass
 
 def main():
-    log_habit()
-    results = view_progress()
-    for habit_name, status_counts in results.items():
-        print(f"{habit_name}: {status_counts['done']} done, {status_counts['missed']} missed")
+    while True:
+        print("\n--- Habit Tracker ---")
+        print("1. Log a habit")
+        print("2. View progress")
+        print("3. Quit")
+        choice = input("Choose an option: ").strip()
 
+        if choice == "1":
+            log_habit()
+        elif choice == "2":
+            result = view_progress()
+            for habit_name, status_counts in result.items():
+                print(f"{habit_name}: {status_counts['done']} done, {status_counts['missed']} missed")
+        elif choice == "3":
+            # TODO: figure out how to exit a while True loop
+            break
+            # hint: look up the "break" keyword
+            pass
+        else:
+            print("Invalid option, try again.")
 if __name__ == "__main__":
     main()
