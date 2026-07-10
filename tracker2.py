@@ -26,6 +26,54 @@ def already_logged_today(habit_name):
     # 5. If you finish the loop without finding a match, return False
     pass
 
+def get_streak(habit_name):
+    # TODO:
+    # 1. Build a dictionary or set of dates where this habit was "done"
+    #    e.g. done_dates = {"2026-07-08", "2026-07-09"}
+    #    (loop through the file like you've done before, only keep
+    #     entries where habit_name matches AND status == "done")
+    done_dates = []
+    with open(FILENAME, "r") as f:
+        for line in f:
+            if habit_name == str(line.strip().split(",")[1]):
+                if str(line.strip().split(",")[2])== "done":
+                    date = str(line.strip().split(",")[0])
+                    done_dates.append(date)
+                else:
+                    continue
+            else:
+                continue
+    
+    date_objects = [datetime.datetime.strptime(d, "%Y-%m-%d").date() for d in done_dates]
+
+# 2. Sort from newest (today) to oldest (yesterday)
+    date_objects.sort(reverse=True)
+
+# 3. (Optional) Convert back to strings to view the result
+    sorted_dates = [d.strftime("%Y-%m-%d") for d in date_objects]
+
+
+    streak = 0
+
+    # 2. Starting from today, count backward one day at a time:
+    #    - is today's date string in done_dates? if yes, streak += 1, move to yesterday
+    #    - if not, stop counting
+    
+    for date in date_objects:
+        if date == datetime.date.today() - datetime.timedelta(days=streak):
+            streak +=1
+        else:
+            break
+    # 3. return the streak count
+    
+    return streak
+            
+   
+    
+   
+    
+        
+
 def log_habit():
     # TODO:
     # 1. Ask the user (input()) for a habit name
@@ -77,7 +125,8 @@ def main():
         print("\n--- Habit Tracker ---")
         print("1. Log a habit")
         print("2. View progress")
-        print("3. Quit")
+        print("3. Get streak for specific habit")
+        print("4. Quit")
         choice = input("Choose an option: ").strip()
 
         if choice == "1":
@@ -85,12 +134,20 @@ def main():
         elif choice == "2":
             result = view_progress()
             for habit_name, status_counts in result.items():
-                print(f"{habit_name}: {status_counts['done']} done, {status_counts['missed']} missed")
+                streak = get_streak(habit_name)
+                print(f"{habit_name}: {status_counts['done']} done, {status_counts['missed']} missed, streak: {streak}")
+        
         elif choice == "3":
-            # TODO: figure out how to exit a while True loop
+            habit = input("Type a valid habit: ")
+            print(get_streak(habit))
+        
+        elif choice == "4":
+                # TODO: figure out how to exit a while True loop
             break
             # hint: look up the "break" keyword
             pass
+        
+            
         else:
             print("Invalid option, try again.")
 if __name__ == "__main__":
