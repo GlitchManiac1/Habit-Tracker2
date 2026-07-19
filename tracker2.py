@@ -159,7 +159,7 @@ def main():
             delete_habit()    
             
         elif choice == "6":
-            delete_habit()
+            break
         else:
             print("Invalid option, try again.")
 
