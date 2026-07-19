@@ -156,7 +156,7 @@ def main():
             print(get_streak(habit))
         
         elif choice == "5":
-            break     
+            delete_habit()    
             
         elif choice == "6":
             delete_habit()
