@@ -104,7 +104,7 @@ def delete_habit():
     for item in habit_list:
         print(item)
     while True:
-        habit = input("Which habit do you want to delete? If you want to delete all type 'all' ").lower()
+        habit = input("Which habit do you want to delete? If you want to delete all type 'all' and type 'none' to leave ").lower()
         if habit == "all":
             cursor.execute("DELETE FROM user_list")
             connection.commit()
@@ -113,6 +113,9 @@ def delete_habit():
         elif habit in habit_list:
             cursor.execute("DELETE FROM user_list WHERE user_habit = ?",(habit,))
             connection.commit()
+            break
+
+        elif habit =="none":
             break
 
         else:
