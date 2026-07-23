@@ -74,14 +74,16 @@
             letter-spacing: 0.05em;
         }
 
-        /* NEW: Log Habit Navigation Link Wrapper & Styling */
+        /* Log/Add Habit Navigation Link Wrapper & Styling */
         .nav-actions {
             margin-bottom: 24px;
             display: flex;
             justify-content: center;
+            gap: 12px; /* Adds space between the buttons */
+            flex-wrap: wrap; /* Wraps buttons neatly on very small mobile screens */
         }
 
-        .btn-log {
+        .btn-log, .btn-add {
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -98,6 +100,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
+        /* Unique Hover state for the Log Button (Violet Glow) */
         .btn-log:hover {
             background: rgba(99, 102, 241, 0.15);
             border-color: rgba(129, 140, 248, 0.4);
@@ -106,7 +109,16 @@
             box-shadow: 0 6px 20px rgba(99, 102, 241, 0.15);
         }
 
-        .btn-log:active {
+        /* NEW: Unique Hover state for the Add Button (Emerald/Green Glow) */
+        .btn-add:hover {
+            background: rgba(52, 211, 153, 0.12);
+            border-color: rgba(52, 211, 153, 0.4);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 211, 153, 0.15);
+        }
+
+        .btn-log:active, .btn-add:active {
             transform: translateY(0);
         }
 
@@ -193,8 +205,9 @@
             <p class="subtitle">Track your consistency, unlock your potential</p>
         </header>
 
-        <!-- Dynamic navigation button matching design -->
+        <!-- Dynamic navigation buttons aligned side-by-side -->
         <div class="nav-actions">
+            <a href="/add" class="btn-add">➕ Add Habits</a>
             <a href="/log" class="btn-log">📝 Log a Habit</a>
         </div>
 

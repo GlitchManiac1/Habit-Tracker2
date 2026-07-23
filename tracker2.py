@@ -119,13 +119,14 @@ def get_streak(habit_name):
     finally:
         connection.close()
         
-def input_habit():
+def input_habit(habit_text=None):
     connection = sqlite3.connect("habits.db")
     cursor = connection.cursor()
     try:
-        print("Type out your habits, separating them with a comma")
-        user_habit = input("Type here: ")
-        user_list = [item.strip().lower() for item in user_habit.split(",")]
+        if habit_text == None:
+            print("Type out your habits, separating them with a comma")
+            habit_text = input("Type here: ")
+        user_list = [item.strip().lower() for item in habit_text.split(",")]
         for habit in user_list:
             try:
                 cursor.execute("INSERT INTO user_list (user_habit) VALUES (?);",(habit,))

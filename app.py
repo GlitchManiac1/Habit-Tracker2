@@ -39,11 +39,34 @@ def log():
                 message="Failed to log habit. It may already be logged today or doesn't exist.",
                 redirect_url="/log"
             )
-    
         
-
     habit_list = tracker2.habit_list()
     return render_template('log.html', habits=habit_list)
 
+@app.route("/add", methods=["GET","POST"])
+def add():
+    if request.method == "POST":
+        habits_text = request.form.get("habits")
+        if habits_text:
+            habit_list = [habit.strip().lower() for habit in habits_text.split(",") if habit.strip()]
+            tracker2.input_habit(habits_text)
+
+            return render_template(
+                'message.html',
+                success=True,
+                message=f"Added {len(habit_list)} habit(s) successfully!",
+                redirect_url="/"
+            )
+
+        else:
+            return render_template(
+                'message.html',
+                success=False,
+                message="No habits entered. Please try again.",
+                redirect_url="/add"
+            )
+
+    return render_template('add.html')
+        
 if __name__ == "__main__":
     app.run(debug=True)
