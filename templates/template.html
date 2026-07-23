@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker Dashboard</title>
+    <style>
+        /* Modern, minimal layout reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #f8fafc;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Background glow effect */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 50%;
+            filter: blur(100px);
+            top: 10%;
+            left: 20%;
+            z-index: 0;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 700px; /* Reduced from 900px for a better single-column presentation */
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header styling matching your gradient text */
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(to right, #38bdf8, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* NEW: Log Habit Navigation Link Wrapper & Styling */
+        .nav-actions {
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-log {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 12px 24px;
+            border-radius: 12px;
+            color: #e2e8f0;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.01em;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-log:hover {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: rgba(129, 140, 248, 0.4);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.15);
+        }
+
+        .btn-log:active {
+            transform: translateY(0);
+        }
+
+        /* Progress List Section expanded to take full width */
+        .progress-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 24px;
+            width: 100%;
+        }
+
+        .habit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Individual Habit Row Item */
+        .habit-item {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .habit-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .habit-name {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #38bdf8;
+        }
+
+        .habit-stats {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            letter-spacing: 0.02em;
+        }
+
+        /* Styled highlight metrics matching your log format */
+        .stat-badge {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-left: 6px;
+            font-family: monospace;
+        }
+        
+        .stat-done { color: #34d399; }      /* Green for done */
+        .stat-missed { color: #f87171; }    /* Red for missed */
+        .stat-streak { color: #fbbf24; }    /* Gold/Yellow for streak */
+
+        /* Progress Bar Graphics */
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: #0f172a;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            border-radius: 4px;
+            /* Added smooth growth animation when template renders width alterations */
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <header>
+            <h1>Habit Tracker</h1>
+            <p class="subtitle">Track your consistency, unlock your potential</p>
+        </header>
+
+        <!-- Dynamic navigation button matching design -->
+        <div class="nav-actions">
+            <a href="/log" class="btn-log">📝 Log a Habit</a>
+        </div>
+
+        <!-- The progress card expands across the full dashboard layout -->
+        <main class="progress-card">
+            
+            <div class="habit-list">
+                {% for habit in habits %}
+                <div class="habit-item">
+                    <div class="habit-meta">
+                        <span class="habit-name">{{ habit.name }}</span>
+                        <span class="habit-stats">
+                            <span class="stat-done">{{ habit.done }} done</span>,
+                            <span class="stat-missed">{{ habit.missed }} missed</span>,
+                            <span class="stat-streak">streak: {{ habit.streak }}</span>
+                        </span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-fill" style="width: {{ 0 if (habit.done + habit.missed) == 0 else (habit.done / (habit.done + habit.missed) * 100) }}%;"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

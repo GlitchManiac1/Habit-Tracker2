@@ -2,11 +2,11 @@ import datetime
 import sqlite3
 
 #creation of database file habits.db
-connection = sqlite3.connect("habits.db")
-cursor = connection.cursor()
+temp_connection = sqlite3.connect("habits.db")
+temp_cursor = temp_connection.cursor()
 
 #creation of habits table
-cursor.execute(
+temp_cursor.execute(
     """CREATE TABLE IF NOT EXISTS habits(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             date_logged TEXT NOT NULL,
@@ -15,117 +15,161 @@ cursor.execute(
     );"""
 )
 
-cursor.execute(
+temp_cursor.execute(
     """CREATE TABLE IF NOT EXISTS user_list(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_habit TEXT NOT NULL UNIQUE
     );"""
 )
 
+temp_connection.commit()
+temp_connection.close()
+
 #input a habit function
-def log_habit():
-    habit = input("Please enter a habit name: ").strip().lower()
-    cursor.execute("SELECT user_habit FROM user_list")
-    results = cursor.fetchall()
-    results_list = [item[0] for item in results]
-    if habit not in results_list:
-        print("Habit inputted is not part of list. Please type the items in your list")
-        for item in results_list:
-            print(item)
-        return
-    answer = already_logged_today(habit)
-    if answer == True:
-        print("You already logged that habit today")
-        return
-    
-    affirm = input("Was it done or missed: ").strip().lower()
+def log_habit(habit=None,affirm=None):
+    connection = sqlite3.connect("habits.db")
+    cursor = connection.cursor()
+    try:
+        if habit== None:
+            habit = input("Please enter a habit name: ").strip().lower()
+        cursor.execute("SELECT user_habit FROM user_list")
+        results = cursor.fetchall()
+        results_list = [item[0] for item in results]
+        if habit not in results_list:
+            print("Habit inputted is not part of list. Please type the items in your list")
+            for item in results_list:
+                print(item)
+            return False
+        answer = already_logged_today(habit)
+        if answer == True:
+            print("You already logged that habit today")
+            return False
+        if affirm == None:
+            affirm = input("Was it done or missed: ").strip().lower()
 
-    date = str(datetime.date.today())
+        date = str(datetime.date.today())
 
-    record = (date,habit,affirm)
-    cursor.execute("INSERT INTO habits (date_logged,habit_name,status) VALUES (?,?,?);",record)
-    connection.commit()
+        record = (date,habit,affirm)
+        cursor.execute("INSERT INTO habits (date_logged,habit_name,status) VALUES (?,?,?);",record)
+        connection.commit()
+        return True
+    finally:
+        connection.close()
 
+def habit_list():
+    connection = sqlite3.connect("habits.db")
+    cursor = connection.cursor()
+    try:
+        cursor.execute("SELECT user_habit FROM user_list")
+        results = cursor.fetchall()
+        habit_list = [row[0] for row in results]
+        return habit_list
+    finally:
+        connection.close()
 
 def view_progress():
-    counts = {}
-    cursor.execute("SELECT habit_name,status FROM habits")
-    results = cursor.fetchall()
-    cursor.execute("SELECT user_habit FROM user_list")
-    activities = cursor.fetchall()
-    for item in activities:
-        if item[0] not in counts:
-            counts[item[0]] = {"done":0 , "missed":0}
-        
-    for item in results:
-        if item[0] not in counts:   
-            counts[item[0]] = {"done": 0, "missed": 0}
-        counts[item[0]][item[1]] += 1
-    return counts
+    connection = sqlite3.connect("habits.db")
+    cursor = connection.cursor()
+    try:
+        counts = {}
+        cursor.execute("SELECT habit_name,status FROM habits")
+        results = cursor.fetchall()
+        cursor.execute("SELECT user_habit FROM user_list")
+        activities = cursor.fetchall()
+        for item in activities:
+            if item[0] not in counts:
+                counts[item[0]] = {"done":0 , "missed":0}
+            
+        for item in results:
+            if item[0] not in counts:   
+                counts[item[0]] = {"done": 0, "missed": 0}
+            counts[item[0]][item[1]] += 1
+        return counts
+    finally:
+        connection.close()
 
 
 def already_logged_today(habit_name):
-    state = False
-    date_today = str(datetime.date.today())
-    cursor.execute("SELECT date_logged,habit_name FROM habits WHERE date_logged=? AND habit_name=?", (date_today,habit_name))
-    results = cursor.fetchall()
-    if len(results) != 0:
-        state = True
-    return state
+    connection = sqlite3.connect("habits.db")
+    cursor = connection.cursor()
+    try:
+        state = False
+        date_today = str(datetime.date.today())
+        cursor.execute("SELECT date_logged,habit_name FROM habits WHERE date_logged=? AND habit_name=?", (date_today,habit_name))
+        results = cursor.fetchall()
+        if len(results) != 0:
+            state = True
+        return state
+    finally:
+        connection.close()
    
 def get_streak(habit_name):
-    cursor.execute("SELECT date_logged FROM habits WHERE habit_name =? AND status=? ORDER BY date_logged DESC", (habit_name,"done"))
-    results = cursor.fetchall()
-    streak = 0
-    for item in results:
-        if item[0]==str(datetime.date.today()-datetime.timedelta(days=streak)):
-            streak+=1
-        else:
-            break
-    return streak   
+    connection = sqlite3.connect("habits.db")
+    cursor = connection.cursor()
+    try:
+        cursor.execute("SELECT date_logged FROM habits WHERE habit_name =? AND status=? ORDER BY date_logged DESC", (habit_name,"done"))
+        results = cursor.fetchall()
+        streak = 0
+        for item in results:
+            if item[0]==str(datetime.date.today()-datetime.timedelta(days=streak)):
+                streak+=1
+            else:
+                break
+        return streak   
+    finally:
+        connection.close()
         
 def input_habit():
-    print("Type out your habits, separating them with a comma")
-    user_habit = input("Type here: ")
-    user_list = [item.strip().lower() for item in user_habit.split(",")]
-    for habit in user_list:
-        try:
-            cursor.execute("INSERT INTO user_list (user_habit) VALUES (?);",(habit,))
-            connection.commit()
-        except sqlite3.IntegrityError:
-            print(f"Habit '{habit}' already exists in the list")
-    return user_list
-        
+    connection = sqlite3.connect("habits.db")
+    cursor = connection.cursor()
+    try:
+        print("Type out your habits, separating them with a comma")
+        user_habit = input("Type here: ")
+        user_list = [item.strip().lower() for item in user_habit.split(",")]
+        for habit in user_list:
+            try:
+                cursor.execute("INSERT INTO user_list (user_habit) VALUES (?);",(habit,))
+                connection.commit()
+            except sqlite3.IntegrityError:
+                print(f"Habit '{habit}' already exists in the list")
+        return user_list
+    finally:
+        connection.close()
 
 def delete_habit():
-    cursor.execute("SELECT DISTINCT user_habit FROM user_list")
-    results = cursor.fetchall()
-    habit_list = [item[0] for item in results]
-    for item in habit_list:
-        print(item)
-    while True:
-        habit = input("Which habit do you want to delete? If you want to delete all type 'all' and type 'none' to leave ").lower()
-        if habit == "all":
-            cursor.execute("DELETE FROM user_list")
-            connection.commit()
-            break
+    connection = sqlite3.connect("habits.db")
+    cursor = connection.cursor()
+    try:
+        cursor.execute("SELECT DISTINCT user_habit FROM user_list")
+        results = cursor.fetchall()
+        habit_list = [item[0] for item in results]
+        for item in habit_list:
+            print(item)
+        while True:
+            habit = input("Which habit do you want to delete? If you want to delete all type 'all' and type 'none' to leave ").lower()
+            if habit == "all":
+                cursor.execute("DELETE FROM user_list")
+                connection.commit()
+                break
 
-        elif habit in habit_list:
-            cursor.execute("DELETE FROM user_list WHERE user_habit = ?",(habit,))
-            connection.commit()
-            break
+            elif habit in habit_list:
+                cursor.execute("DELETE FROM user_list WHERE user_habit = ?",(habit,))
+                connection.commit()
+                break
 
-        elif habit =="none":
-            break
+            elif habit =="none":
+                break
 
-        else:
-           print("Habit is not in list. Please try again")
-    
-    cursor.execute("SELECT DISTINCT user_habit FROM user_list")
-    results = cursor.fetchall()
-    habit_list = [item[0] for item in results]
-    for item in habit_list:
-        print(item)
+            else:
+                print("Habit is not in list. Please try again")
+        
+        cursor.execute("SELECT DISTINCT user_habit FROM user_list")
+        results = cursor.fetchall()
+        habit_list = [item[0] for item in results]
+        for item in habit_list:
+            print(item)
+    finally:
+        connection.close()
 
 
 
