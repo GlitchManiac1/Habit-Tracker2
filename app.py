@@ -67,6 +67,30 @@ def add():
             )
 
     return render_template('add.html')
+
+@app.route("/delete", methods=["GET","POST"])
+def delete():
+    if request.method == "POST":
+        habit = request.form.get("habit")
+        success = tracker2.delete_habit(habit)
+        if success:
+            return render_template(
+                'message.html',
+                success=True,
+                message="Your habit has been deleted successfully!",
+                redirect_url="/"
+            )
+        else:
+            return render_template(
+                'message.html',
+                success=False,
+                message="Failed to delete habit. It doesn't exist.",
+                redirect_url="/delete"
+            )
+    habit_list = tracker2.habit_list()
+    return render_template('delete.html', habits=habit_list)
+    
+        
         
 if __name__ == "__main__":
     app.run(debug=True)

@@ -72,7 +72,13 @@ def view_progress():
     cursor = connection.cursor()
     try:
         counts = {}
-        cursor.execute("SELECT habit_name,status FROM habits")
+        cursor.execute("SELECT user_habit FROM user_list")
+        results = tuple(item[0] for item in cursor.fetchall())
+        if not results:
+           return {}
+        placeholders = ', '.join(['?'] * len(results))
+        query = f"SELECT habit_name, status FROM habits WHERE habit_name IN ({placeholders})"
+        cursor.execute(query,results)
         results = cursor.fetchall()
         cursor.execute("SELECT user_habit FROM user_list")
         activities = cursor.fetchall()
@@ -137,38 +143,49 @@ def input_habit(habit_text=None):
     finally:
         connection.close()
 
-def delete_habit():
+def delete_habit(habit=None):
     connection = sqlite3.connect("habits.db")
     cursor = connection.cursor()
     try:
-        cursor.execute("SELECT DISTINCT user_habit FROM user_list")
-        results = cursor.fetchall()
-        habit_list = [item[0] for item in results]
-        for item in habit_list:
-            print(item)
-        while True:
-            habit = input("Which habit do you want to delete? If you want to delete all type 'all' and type 'none' to leave ").lower()
-            if habit == "all":
-                cursor.execute("DELETE FROM user_list")
-                connection.commit()
-                break
+        if habit == None:
+            cursor.execute("SELECT DISTINCT user_habit FROM user_list")
+            results = cursor.fetchall()
+            habit_list = [item[0] for item in results]
+            for item in habit_list:
+                print(item)
+            while True:
+                habit = input("Which habit do you want to delete? If you want to delete all type 'all' and type 'none' to leave ").lower()
+                if habit == "all":
+                    cursor.execute("DELETE FROM user_list")
+                    connection.commit()
+                    break
 
-            elif habit in habit_list:
+                elif habit in habit_list:
+                    cursor.execute("DELETE FROM user_list WHERE user_habit = ?",(habit,))
+                    connection.commit()
+                    break
+
+                elif habit =="none":
+                    break
+
+                else:
+                    print("Habit is not in list. Please try again")
+            
+            cursor.execute("SELECT DISTINCT user_habit FROM user_list")
+            results = cursor.fetchall()
+            habit_list = [item[0] for item in results]
+            for item in habit_list:
+                print(item)
+        else:
+            cursor.execute("SELECT user_habit FROM user_list")
+            results = cursor.fetchall()
+            habits = [row[0] for row in results]
+            if habit in habits:
                 cursor.execute("DELETE FROM user_list WHERE user_habit = ?",(habit,))
                 connection.commit()
-                break
-
-            elif habit =="none":
-                break
-
+                return True
             else:
-                print("Habit is not in list. Please try again")
-        
-        cursor.execute("SELECT DISTINCT user_habit FROM user_list")
-        results = cursor.fetchall()
-        habit_list = [item[0] for item in results]
-        for item in habit_list:
-            print(item)
+                return False
     finally:
         connection.close()
 

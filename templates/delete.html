@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log a Habit</title>
+    <title>Delete a Habit</title>
     <style>
         /* Modern, minimal layout reset */
         * {
@@ -37,7 +37,7 @@
             z-index: 0;
         }
 
-        /* The Card Container - Perfectly matches dashboard container */
+        /* The Card Container */
         .log-card {
             width: 100%;
             max-width: 500px;
@@ -55,7 +55,7 @@
             font-size: clamp(2rem, 4vw, 2.5rem);
             font-weight: 800;
             letter-spacing: -0.03em;
-            background: linear-gradient(to right, #38bdf8, #818cf8, #c084fc);
+            background: linear-gradient(to right, #f43f5e, #fb7185, #c084fc);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 8px;
@@ -96,7 +96,8 @@
             color: #f8fafc;
             transition: all 0.2s ease-in-out;
             cursor: pointer;
-            appearance: none; /* Modern custom arrow base style reset */
+            appearance: none;
+            /* Modern custom arrow base style reset */
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://w3.org' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
             background-position: right 16px center;
@@ -110,16 +111,16 @@
         }
 
         select:focus {
-            border-color: rgba(129, 140, 248, 0.6);
-            box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
+            border-color: rgba(244, 63, 94, 0.6);
+            box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.2);
             outline: none;
             background-color: rgba(15, 23, 42, 0.8);
         }
 
-        /* --- Action Button (Matching Dashboard log theme link style) --- */
-        .btn-log {
+        /* --- Action Button (Destructive Theme) --- */
+        .btn-delete {
             width: 100%;
-            background: linear-gradient(to right, #38bdf8, #818cf8);
+            background: linear-gradient(to right, #e11d48, #f43f5e);
             color: #ffffff;
             border: none;
             padding: 14px 24px;
@@ -128,18 +129,18 @@
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 4px 12px rgba(225, 29, 72, 0.2);
             margin-top: 8px;
             letter-spacing: 0.02em;
         }
 
-        .btn-log:hover {
+        .btn-delete:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 6px 20px rgba(225, 29, 72, 0.4);
             filter: brightness(1.1);
         }
 
-        .btn-log:active {
+        .btn-delete:active {
             transform: translateY(0);
         }
 
@@ -159,7 +160,7 @@
         }
 
         .nav-link:hover {
-            color: #38bdf8;
+            color: #f43f5e;
         }
 
         /* --- Flash / Message Area --- */
@@ -167,9 +168,9 @@
             margin-top: 20px;
             padding: 12px 16px;
             border-radius: 10px;
-            background: rgba(52, 211, 153, 0.1);
-            color: #34d399;
-            border: 1px solid rgba(52, 211, 153, 0.2);
+            background: rgba(244, 63, 94, 0.1);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, 0.2);
             font-size: 0.95rem;
             text-align: center;
             display: none; /* Hidden by default */
@@ -177,38 +178,28 @@
     </style>
 </head>
 <body>
-
     <div class="log-card">
-        <h1>📝 Log a Habit</h1>
-        <p class="subtitle">Mark today's progress for one of your habits.</p>
-
+        <h1>Delete a habit</h1>
+        <p class="subtitle">Remove a habit from your list permanently.</p>
+        
         <form method="POST" action="">
             <div class="form-group">
-                <label for="habit-select">Select Habit</label>
+                <label for="habit-select">Select Habit to Remove</label>
                 <select id="habit-select" name="habit" required>
                     {% for habit in habits %}
                         <option value="{{ habit }}">{{ habit }}</option>
                     {% endfor %}
                 </select>
             </div>
-
-            <div class="form-group">
-                <label for="status-select">Status</label>
-                <select id="status-select" name="status" required>
-                    <option value="done">✅ Done</option>
-                    <option value="missed">❌ Missed</option>
-                </select>
-            </div>
-
-            <button type="submit" class="btn-log">Log It</button>
+            
+            <button type="submit" class="btn-delete">Delete Habit</button>
         </form>
-
+        
         <div class="nav-link-container">
             <a href="/" class="nav-link">← Back to Dashboard</a>
         </div>
-
         
+      
     </div>
-
 </body>
 </html>
